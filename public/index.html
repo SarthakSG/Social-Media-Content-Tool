@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Social Media Control</title>
+  <link rel="shortcut icon" href="ic_launcher.png" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://use.fontawesome.com/2f17130d40.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css"
+    integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+  <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9"
+    crossorigin="anonymous"></script>
+  <script>$(document).ready(function () { $('body').bootstrapMaterialDesign(); });</script>
+  <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+  <script type="text/javascript" src="//platform.linkedin.com/in.js">
+    api_key: 81osuytlvt83mq
+    onLoad: onLinkedInLoad
+    authorize: true
+    lang: en_us
+  </script>
+  <link rel="stylesheet" href="stylesheets/main.css">
+</head>
+
+<body>
+
+  <div id="fb-root"></div>
+  <div id="saved_posts">
+
+    <button class="btn btn-raised btn-primary mt-4 ml-3" type="button" id="post_btn" onclick="window.open('/saved-posts.html')">
+      View Saved Posts</button>
+    <div class="alert alert-info m-2" role="alert">
+      <h5 id="alert_console">Console : </h5>
+    </div>
+  </div>
+  <div class="auth">
+    <div id="auth-status" class="alert alert-info" role="alert">Login to save posts</div>
+
+    <button class="btn btn-raised btn-primary mt-1 ml-3" style="float: rights" type="button" id="post_btn" onclick="login()">
+      Login</button>
+    <div id="firebaseui-auth-container"></div>
+
+  </div>
+
+  <div id="main_container" class="card container w-75 form mt-4 mb-2" style="/* max-width: 800px; min-width: 600px; */">
+
+    <div>
+      <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+        <strong>Instructions</strong>
+        <br>1. Set the search tags (context of news to fetch).
+        <br>2. Set the number of news items to fetch.
+        <br>3. Set the start date of the slot from which news are to be fetched (Initially current date).
+        <br>4. Select the news sources from where news are to be fetched.
+        <br>5. Click the 'Fetch news' button. A list of list of news items will be displayed.
+        <br>6. Check the Checkbox above the title to select the news item (First item is already checked).
+        <br>7. Enter the Custom text .
+        <br>Posting :
+        <br>1. Login to Social Media.
+        <br>2. Hit Post.
+        <br>* Format of Post :
+        <br>- Custom Text
+        <br>- News Description
+        <br>- News featured image linking to source page.
+        <br>Copying/Saving Post :
+        <br>1. Enter the Custom text .
+        <br>2. Hit Copy Post or Save Post.
+        <br>* Please Login to the app to save posts
+
+
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-inline w-100">
+      <input class="form-control m-1" type="text" name="search" size="35" id="search_tags" placeholder="Search Tags">
+      <input class="form-control m-1" type="number" max="15" name="post_count" id="post_count" placeholder="Number of posts ">
+      <!--       <input class="form-control m-1" type="number" max="5" name="days_count" id="days_count" placeholder="Number of past Days to search">
+ -->
+      <div class="form-group bmd-form-group">
+        <label for="from_date" class="bmd-label-floating">Start Date </label>
+
+        <input type="date" name="from_date" id="from_date" value="2018-07-01" placeholder="Start Date ">
+      </div>
+
+
+
+    </div>
+    <div class="m-4">
+      <h5>News Sources</h5>
+      <div id="news_sources_element" class=""></div>
+    </div>
+
+
+    <button class="btn btn-primary mt-3 w-25" style="margin: auto" type="button" id="fetch_news" onclick="fetch_news()"> Fetch News </button>
+
+    <div id="news_results"></div>
+
+    <div class=" form-inline">
+      <input class="form-control " type="text" id="page_name" placeholder="Page Name">
+
+      <button class="btn btn-primary mt-3 ml-3" type="button" id="login_btn" onclick="fb_login()">
+        <i class="fa fa-2x fa-facebook" aria-hidden="true"></i> Login</button>
+
+      <button class="btn btn-primary mt-3 ml-3" type="button" id="post_btn" onclick="fb_post()">
+        <i class="fa fa-2x fa-facebook" aria-hidden="true"></i> Post</button>
+    </div>
+
+    <div class="">
+      <button class="btn btn-primary mt-3 ml-3" type="button" id="login_btn" onclick="twitter_login()">
+        <i class="fa fa-2x fa-twitter" aria-hidden="true"></i>
+        </i> Login</button>
+      <button class="btn btn-primary mt-3 ml-3" type="button" id="post_btn" onclick="twitter_post()">
+        <i class="fa fa-2x fa-twitter" aria-hidden="true"></i> Post</button>
+
+    </div>
+
+
+    <div class="">
+
+
+      <button class="btn btn-primary mt-3 ml-3" type="button" id="login_btn">
+        <script type="in/Login"></script>
+      </button>
+      <button class="btn btn-primary mt-4 ml-3" type="button" id="post_btn" onclick="linkedin_post()">
+        <i class="fa fa-2x fa-linkedin" aria-hidden="true"></i> Post</button>
+    </div>
+    <div class="m-1">
+      <div id="error">
+        <h6>Console</h6>
+      </div>
+    </div>
+    <div id="rightbottom" style="
+        position:fixed;
+        bottom: 0;
+        left: 0;">
+      <div class="alert alert-info" role="alert">
+        v1.3.0
+        <br>Developed By - Sarthak SG </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyClcoJtR5fZId636FgcMfLyyMjSwfcKjEE",
+        authDomain: "social-media-manager-2018.firebaseapp.com",
+        databaseURL: "https://social-media-manager-2018.firebaseio.com",
+        projectId: "social-media-manager-2018",
+        storageBucket: "social-media-manager-2018.appspot.com",
+        messagingSenderId: "353152272864"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script>
+      var auth = firebase.auth();
+      var db = firebase.database();
+      var dbRef;
+      var user = auth.currentUser;
+      var proIndia = false;
+      auth.onAuthStateChanged((currentUser) => {
+        user = currentUser;
+        if (!user) {
+          document.getElementById('saved_posts').style.display = "none";
+          
+        }
+        else{
+          console.log(user);
+        document.getElementById('auth-status').innerHTML = "Logged in as " + user.displayName;
+        if(user.email.indexOf("@india-recycling.com")!=-1){
+       /*  document.getElementById('search_tags').value = "plastic pollution environment";
+        document.getElementById('post_count').value = "20" */
+    }
+        }
+        
+
+
+      });
+
+    </script>
+    <script src="authentication.js"></script>
+    <script src="fb_handle.js"></script>
+    <script src="linkedin_handle.js"></script>
+    <script src="fetchNews.js"></script>
+    <script src="save_posts.js"></script>
+
+    <script>
+        function onDeviceReady() {
+          if (navigator.connection.type == Connection.NONE) {
+            navigator.notification.alert('An internet connection is required to continue');
+          } else {
+            window.location="http://www.myapp.com";
+          }
+        }
+        document.addEventListener("deviceready", onDeviceReady, false);
+      </script>
+</body>
+
+</html>
